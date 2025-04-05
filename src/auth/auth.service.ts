@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { AuthResponse } from './dto/auth.response';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,30 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(dto: SignupDto) {
+  private async generateAuthResponse(user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  }): Promise<AuthResponse> {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+      token: this.jwtService.sign(payload),
+    };
+  }
+
+  async signup(dto: SignupDto): Promise<AuthResponse> {
     const { name, email, password } = dto;
 
     const userExists = await this.prisma.user.findUnique({ where: { email } });
@@ -33,17 +57,18 @@ export class AuthService {
         password: hashedPassword,
       },
     });
-    return {
-      id: createdUser.id,
-      name: createdUser.name,
-      email: createdUser.email,
-    };
+
+    return this.generateAuthResponse(createdUser);
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto): Promise<AuthResponse> {
     const { email, password } = dto;
 
-    const user = await this.prisma.user.findUnique({ where: { email: email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true, email: true, name: true, role: true, password: true },
+    });
+
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
@@ -53,19 +78,6 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
-
-    return {
-      access_token: this.jwtService.sign(payload),
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-    };
+    return this.generateAuthResponse(user);
   }
 }
