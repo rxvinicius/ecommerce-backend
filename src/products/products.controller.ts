@@ -20,6 +20,7 @@ import { RoleAccessGuard } from 'src/access-control/guards/role-access.guard';
 import { RequiredRole } from 'src/access-control/decorators/required-role.decorator';
 import { UserRole } from 'src/shared/constants/roles.enum';
 import { RequestWithUser } from 'src/types/request-with-user';
+import { MAX_PRODUCT_IMAGES } from 'src/config/upload.config';
 
 import { ProductsService } from './products.service';
 import { CreateProductBodyDto } from './dto/create-product.body.dto';
@@ -45,7 +46,7 @@ export class ProductsController {
   @Post()
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
   @RequiredRole(UserRole.ADMIN)
-  @UseInterceptors(FilesInterceptor('images', 6))
+  @UseInterceptors(FilesInterceptor('images', MAX_PRODUCT_IMAGES))
   async create(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: CreateProductBodyDto,

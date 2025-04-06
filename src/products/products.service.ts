@@ -131,6 +131,18 @@ export class ProductsService {
     }
   }
 
+  private extractPublicId(imageUrl: string): string {
+    try {
+      const url = new URL(imageUrl);
+      const pathParts = url.pathname.split('/');
+      const fileName = pathParts.at(-1);
+      const folder = pathParts.at(-2);
+      return `${folder}/${fileName?.split('.')[0]}`;
+    } catch {
+      throw new BadRequestException('Invalid image URL');
+    }
+  }
+
   async remove(id: string): Promise<void> {
     try {
       const product = await this.prisma.product.findUnique({ where: { id } });
@@ -138,8 +150,23 @@ export class ProductsService {
         throw new NotFoundException(this.notFoundMsg);
       }
 
-      await this.prisma.product.delete({ where: { id } });
+      // 1. Start the transaction and delete the product from the database
+      await this.prisma.$transaction(async (tx) => {
+        await tx.product.delete({ where: { id } });
+      });
+
+      // 2. After success, delete images in Cloudinary
+      const deletionPromises = product.images.map((url) => {
+        const publicId = this.extractPublicId(url);
+        return cloudinary.uploader.destroy(publicId, {
+          resource_type: 'image',
+        });
+      });
+
+      await Promise.all(deletionPromises);
     } catch (error) {
+      console.error('Error trying to delete products:', error);
+
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException('Failed to delete product');
     }
