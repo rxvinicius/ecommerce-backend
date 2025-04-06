@@ -11,6 +11,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductBodyDto } from './dto/create-product.body.dto';
 import { ProductResponse } from './dto/product.response';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PaginationDto } from 'src/shared/dto/pagination.dto';
+import { PaginationMeta } from 'src/shared/types/pagination-meta.type';
 
 @Injectable()
 export class ProductsService {
@@ -50,12 +52,28 @@ export class ProductsService {
     }
   }
 
-  async findAll(): Promise<ProductResponse[]> {
+  async findAll({ page, limit }: PaginationDto): Promise<{
+    data: ProductResponse[];
+    meta: PaginationMeta;
+  }> {
     try {
-      const products = await this.prisma.product.findMany({
-        orderBy: { createdAt: 'desc' },
-      });
-      return products;
+      const skip = (page - 1) * limit;
+
+      const [total, products] = await this.prisma.$transaction([
+        this.prisma.product.count(),
+        this.prisma.product.findMany({
+          skip,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+      ]);
+
+      const lastPage = Math.ceil(total / limit);
+
+      return {
+        data: products,
+        meta: { total, page, limit, lastPage },
+      };
     } catch (error) {
       throw new InternalServerErrorException('Failed to fetch products');
     }

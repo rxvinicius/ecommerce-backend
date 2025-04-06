@@ -12,6 +12,7 @@ import {
   UploadedFiles,
   UseInterceptors,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
@@ -19,21 +20,25 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RoleAccessGuard } from 'src/access-control/guards/role-access.guard';
 import { RequiredRole } from 'src/access-control/decorators/required-role.decorator';
 import { UserRole } from 'src/shared/constants/roles.enum';
-import { RequestWithUser } from 'src/types/request-with-user';
+import { RequestWithUser } from 'src/shared/types/request-with-user';
 import { MAX_PRODUCT_IMAGES } from 'src/config/upload.config';
 
 import { ProductsService } from './products.service';
 import { CreateProductBodyDto } from './dto/create-product.body.dto';
 import { ProductResponse } from './dto/product.response';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PaginationDto } from 'src/shared/dto/pagination.dto';
+import { PaginationMeta } from 'src/shared/types/pagination-meta.type';
 
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
-  async findAll(): Promise<ProductResponse[]> {
-    return this.productsService.findAll();
+  async findAll(
+    @Query() pagination: PaginationDto,
+  ): Promise<{ data: ProductResponse[]; meta: PaginationMeta }> {
+    return this.productsService.findAll(pagination);
   }
 
   @Get(':id')
