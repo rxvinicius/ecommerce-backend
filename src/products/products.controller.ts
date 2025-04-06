@@ -9,14 +9,20 @@ import {
   Request,
   Param,
   ParseUUIDPipe,
+  UploadedFiles,
+  UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UserRole } from 'src/shared/constants/roles.enum';
+import { FilesInterceptor } from '@nestjs/platform-express';
+
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RoleAccessGuard } from 'src/access-control/guards/role-access.guard';
 import { RequiredRole } from 'src/access-control/decorators/required-role.decorator';
+import { UserRole } from 'src/shared/constants/roles.enum';
 import { RequestWithUser } from 'src/types/request-with-user';
+
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductBodyDto } from './dto/create-product.body.dto';
 import { ProductResponse } from './dto/product.response';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -39,12 +45,17 @@ export class ProductsController {
   @Post()
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
   @RequiredRole(UserRole.ADMIN)
+  @UseInterceptors(FilesInterceptor('images', 6))
   async create(
-    @Body() dto: CreateProductDto,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() dto: CreateProductBodyDto,
     @Request() req: RequestWithUser,
   ): Promise<ProductResponse> {
-    const user = req.user;
-    return this.productsService.create(dto, user.sub);
+    if (!files || files.length === 0) {
+      throw new BadRequestException('At least one image is required');
+    }
+
+    return this.productsService.create(dto, files, req.user.sub);
   }
 
   @Put(':id')

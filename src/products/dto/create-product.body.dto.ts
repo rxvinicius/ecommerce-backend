@@ -1,27 +1,27 @@
+import { Type } from 'class-transformer';
 import {
-  IsArray,
   IsNotEmpty,
   IsNumber,
   IsPositive,
   IsString,
-  ArrayMinSize,
+  MinLength,
+  MaxLength,
 } from 'class-validator';
 
-export class CreateProductDto {
+export class CreateProductBodyDto {
   @IsString()
   @IsNotEmpty()
+  @MinLength(3)
+  @MaxLength(200)
   name: string;
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(10)
   description: string;
 
+  @Type(() => Number)
   @IsNumber()
   @IsPositive()
   price: number;
-
-  @IsArray()
-  @ArrayMinSize(1)
-  @IsString({ each: true })
-  images: string[];
 }
