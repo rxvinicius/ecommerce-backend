@@ -11,15 +11,31 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  relationMode = "prisma"
+  relationMode = "foreignKeys"
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
-  email     String   @unique
+  email     String     @unique
   password  String  
-  role      String   @default("CUSTOMER")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      String     @default("CUSTOMER")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  products  Product[]  @relation("UserProductsCreated")
 }
+
+model Product {
+  id          String    @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  images      String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdBy   User?     @relation("UserProductsCreated", fields: [createdById], references: [id])
+  createdById String?
+}
+
