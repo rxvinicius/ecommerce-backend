@@ -4,7 +4,10 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class CorsMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    const allowedOrigins = ['http://localhost:3000'];
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://ecommerce-frontend-phi-nine.vercel.app',
+    ];
 
     const origin = req.headers.origin;
     if (origin && allowedOrigins.includes(origin)) {
