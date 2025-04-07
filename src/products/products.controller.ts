@@ -67,11 +67,13 @@ export class ProductsController {
   @Put(':id')
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
   @RequiredRole(UserRole.ADMIN)
+  @UseInterceptors(FilesInterceptor('images', MAX_PRODUCT_IMAGES))
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: UpdateProductDto,
   ): Promise<ProductResponse> {
-    return this.productsService.update(id, dto);
+    return this.productsService.update(id, dto, files);
   }
 
   @Delete(':id')

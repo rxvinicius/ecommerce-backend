@@ -117,7 +117,11 @@ export class ProductsService {
     }
   }
 
-  async update(id: string, dto: UpdateProductDto): Promise<ProductResponse> {
+  async update(
+    id: string,
+    dto: UpdateProductDto,
+    files: Express.Multer.File[] = [],
+  ): Promise<ProductResponse> {
     try {
       if (!dto || Object.keys(dto).length === 0) {
         throw new BadRequestException('No fields provided for update');
@@ -132,10 +136,49 @@ export class ProductsService {
         throw new NotFoundException(this.notFoundMsg);
       }
 
+      // Parse imagesToRemove from JSON string
+      let imagesToRemove: string[] = [];
+      if (dto.imagesToRemove) {
+        try {
+          imagesToRemove = JSON.parse(dto.imagesToRemove);
+        } catch {
+          throw new BadRequestException('Invalid format for imagesToRemove');
+        }
+      }
+
+      // 1. Generate final image list: removes the ones deleted and adds the new ones (if any)
+      let currentImages = product.images.filter(
+        (url) => !imagesToRemove.includes(url),
+      );
+
+      if (files.length > 0) {
+        const uploadedUrls = await this.uploadImages(files);
+        currentImages = [...currentImages, ...uploadedUrls];
+      }
+
+      // 2. Remove imagesToRemove from DTO before saving to DB
+      const { imagesToRemove: _, ...safeDto } = dto;
+
+      // 3. Update the product with the final image list
       const updated = await this.prisma.product.update({
         where: { id },
-        data: dto,
+        data: {
+          ...safeDto,
+          images: currentImages,
+        },
       });
+
+      // 4. After successful DB update, delete removed images from Cloudinary
+      if (imagesToRemove.length > 0) {
+        await Promise.all(
+          imagesToRemove.map((url) => {
+            const publicId = this.extractPublicId(url);
+            return cloudinary.uploader.destroy(publicId, {
+              resource_type: 'image',
+            });
+          }),
+        );
+      }
 
       return updated;
     } catch (error) {
@@ -145,6 +188,8 @@ export class ProductsService {
       ) {
         throw error;
       }
+
+      console.error('Failed to update product:', error);
       throw new InternalServerErrorException('Failed to update product');
     }
   }

@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsNumber,
@@ -15,6 +16,7 @@ export class UpdateProductDto {
   @IsString()
   description?: string;
 
+  @Type(() => Number)
   @IsOptional()
   @IsNumber()
   @IsPositive()
@@ -24,4 +26,8 @@ export class UpdateProductDto {
   @IsArray()
   @IsString({ each: true })
   images?: string[];
+
+  @IsOptional()
+  @IsString()
+  imagesToRemove?: string;
 }
