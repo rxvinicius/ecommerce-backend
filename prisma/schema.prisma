@@ -1,43 +1,74 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
   relationMode = "foreignKeys"
 }
 
 model User {
-  id        String     @id @default(uuid())
-  name      String
-  email     String     @unique
-  password  String  
-  role      String     @default("CUSTOMER")
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role     String @default("CUSTOMER")
 
-  products  Product[]  @relation("UserProductsCreated")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  products Product[] @relation("UserProductsCreated")
+  orders   Order[]   @relation("UserOrders")
 }
 
 model Product {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String
   price       Float
   images      String[]
   isActive    Boolean  @default(true)
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  createdBy   User?     @relation("UserProductsCreated", fields: [createdById], references: [id])
+  // Foreign Key
   createdById String?
+  createdBy   User?   @relation("UserProductsCreated", fields: [createdById], references: [id])
+
+  // Relations
+  orderItems OrderItem[]
 }
 
+model Order {
+  id         String @id @default(uuid())
+  total      Float
+  cardName   String
+  cardNumber String
+  cardExpiry String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign Key
+  userId String
+  user   User   @relation("UserOrders", fields: [userId], references: [id])
+
+  // Relations
+  items OrderItem[]
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  quantity Int
+
+  // Foreign Keys
+  orderId   String
+  productId String
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}

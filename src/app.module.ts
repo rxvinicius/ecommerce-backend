@@ -7,6 +7,7 @@ import { ProductsModule } from './products/products.module';
 import { AccessControlModule } from './access-control/access-control.module';
 import { CorsMiddleware } from './middlewares/cors.middleware';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     AccessControlModule,
     ProductsModule,
     CloudinaryModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
