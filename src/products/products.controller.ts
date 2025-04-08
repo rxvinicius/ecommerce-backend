@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   BadRequestException,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
@@ -76,10 +77,8 @@ export class ProductsController {
     return this.productsService.update(id, dto, files);
   }
 
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard, RoleAccessGuard)
-  @RequiredRole(UserRole.ADMIN)
-  async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
-    await this.productsService.remove(id);
+  @Patch(':id/deactivate')
+  deactivate(@Param('id') id: string) {
+    return this.productsService.deactivate(id);
   }
 }

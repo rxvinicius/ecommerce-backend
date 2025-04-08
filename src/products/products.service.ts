@@ -60,8 +60,9 @@ export class ProductsService {
       const skip = (page - 1) * limit;
 
       const [total, products] = await this.prisma.$transaction([
-        this.prisma.product.count(),
+        this.prisma.product.count({ where: { isActive: true } }),
         this.prisma.product.findMany({
+          where: { isActive: true },
           skip,
           take: limit,
           orderBy: { createdAt: 'desc' },
@@ -81,7 +82,9 @@ export class ProductsService {
 
   async findOne(id: string): Promise<ProductResponse> {
     try {
-      const product = await this.prisma.product.findUnique({ where: { id } });
+      const product = await this.prisma.product.findUnique({
+        where: { id, isActive: true },
+      });
 
       if (!product) {
         throw new NotFoundException(this.notFoundMsg);
@@ -206,32 +209,10 @@ export class ProductsService {
     }
   }
 
-  async remove(id: string): Promise<void> {
-    try {
-      const product = await this.prisma.product.findUnique({ where: { id } });
-      if (!product) {
-        throw new NotFoundException(this.notFoundMsg);
-      }
-
-      // 1. Start the transaction and delete the product from the database
-      await this.prisma.$transaction(async (tx) => {
-        await tx.product.delete({ where: { id } });
-      });
-
-      // 2. After success, delete images in Cloudinary
-      const deletionPromises = product.images.map((url) => {
-        const publicId = this.extractPublicId(url);
-        return cloudinary.uploader.destroy(publicId, {
-          resource_type: 'image',
-        });
-      });
-
-      await Promise.all(deletionPromises);
-    } catch (error) {
-      console.error('Error trying to delete products:', error);
-
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Failed to delete product');
-    }
+  async deactivate(id: string) {
+    return this.prisma.product.update({
+      where: { id },
+      data: { isActive: false },
+    });
   }
 }
