@@ -57,7 +57,25 @@ export class OrdersService {
           skip,
           take: limit,
           orderBy: { createdAt: 'desc' },
-          include: { items: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            items: {
+              include: {
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    images: true,
+                  },
+                },
+              },
+            },
+          },
         }),
       ]);
 
@@ -93,7 +111,19 @@ export class OrdersService {
           skip,
           take: limit,
           orderBy: { createdAt: 'desc' },
-          include: { items: true },
+          include: {
+            items: {
+              include: {
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    images: true,
+                  },
+                },
+              },
+            },
+          },
         }),
       ]);
 
