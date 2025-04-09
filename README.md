@@ -1,98 +1,132 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🛒 Ecommerce Backend – NestJS + Prisma
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este é o backend da aplicação **Ecommerce** desenvolvida como parte do **desafio técnico da WavingTest**. A API foi construída com **NestJS** e utiliza **Prisma ORM** para persistência de dados, além de autenticação com JWT e integração com **Cloudinary** para upload de imagens dos produtos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 Deploy em Produção
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+> Você pode acessar a API em produção pelo link:
 
-## Project setup
+🔗 **https://ecommerce-rx-vinicius.koyeb.app**
 
-```bash
-$ npm install
-```
+---
 
-## Compile and run the project
+## 📦 Funcionalidades Implementadas
 
-```bash
-# development
-$ npm run start
+### 👤 Área do Cliente
 
-# watch mode
-$ npm run start:dev
+- Cadastro de usuário
+- Login com JWT
+- Listagem de produtos
+- Detalhes de produto
+- Carrinho (gerenciado no frontend)
+- Finalização de pedidos
 
-# production mode
-$ npm run start:prod
-```
+### 🔐 Área Administrativa
 
-## Run tests
+- Login como ADMIN
+- CRUD completo de produtos (com upload de imagens para o Cloudinary)
+- Listagem de todos os pedidos realizados
 
-```bash
-# unit tests
-$ npm run test
+---
 
-# e2e tests
-$ npm run test:e2e
+## 🔧 Tecnologias Utilizadas
 
-# test coverage
-$ npm run test:cov
-```
+- **NestJS** – Estrutura do backend
+- **Prisma ORM** – Acesso tipado ao banco de dados PostgreSQL
+- **JWT** – Autenticação segura
+- **Cloudinary** – Upload de imagens
+- **Swagger** – Documentação da API
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## ⚙️ Como rodar localmente
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 1. Clone o repositório
 
 ```bash
-$ npm install -g mau
-$ mau deploy
+git clone https://github.com/rxvinicius/ecommerce-backend.git
+cd ecommerce-backend
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 2. Instale as dependências
 
-## Resources
+```bash
+npm install
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### 3. Configure o banco de dados
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+> ⚠️ Este projeto não foi testado com banco local, apenas em produção na Neon. Para rodar localmente, você precisará de um banco PostgreSQL e atualizar a variável DATABASE_URL no .env.
 
-## Support
+Exemplo de conexão local:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce?schema=public
+```
 
-## Stay in touch
+Para criar o banco, execute:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+npx prisma migrate dev
+```
 
-## License
+### 4. Configure o arquivo `.env`
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Crie um arquivo .env na raiz com o seguinte conteúdo:
+
+```env
+PORT=3001
+DATABASE_URL=<sua conexão aqui>
+JWT_SECRET=<sua chave secreta>
+CLOUDINARY_CLOUD_NAME=<sua cloud>
+CLOUDINARY_API_KEY=<sua chave>
+CLOUDINARY_API_SECRET=<sua secret>
+```
+
+### 5. Rode o projeto
+
+```bash
+npm run start:dev
+```
+
+A API estará rodando em: http://localhost:3001
+
+## 📁 Estrutura do Projeto
+
+```bash
+src/
+├── auth/                # Módulo de autenticação
+├── products/            # CRUD de produtos
+├── orders/              # Finalização e visualização de pedidos
+├── access-control/      # Controle de acesso por papéis
+├── shared/              # Tipos e middlewares compartilhados
+└── prisma/              # Configuração do ORM
+
+```
+
+## 📌 Observações
+
+- O backend foi deployado via Dockerfile na [Koyeb](https://www.koyeb.com).
+- Todas as entidades possuem validação com class-validator.
+- A API está documentada via Swagger.
+- Testes automatizados podem ser adicionados posteriormente para garantir ainda mais qualidade.
+- O projeto está pronto para expansão com novas funcionalidades e escalabilidade.
+
+## 🧠 Decisões Técnicas & Observações Finais
+
+- ✅ A aplicação foi construída com foco em **boas práticas**, como separação de responsabilidades, consistência nos DTOs, validações robustas e tipagem forte com TypeScript.
+- ❌ Por conta do tempo limitado, **não foi possível implementar testes automatizados (unitários ou e2e)**. No entanto, o projeto está preparado para isso, com Jest já configurado e exemplos de scripts prontos no `package.json`.
+- 🚧 Alguns recursos extras como filtros de produtos e dashboard administrativo foram considerados, mas priorizei entregar o core funcional com qualidade e boa experiência de uso.
+
+## 🙋‍♂️ Desenvolvido por
+
+Vinicius Rodrigues Xavier
+
+## 💬 Contato
+
+Fique à vontade para entrar em contato:
+
+- ✉️ vinicius-rodrigues2000@hotmail.com
+- 📞 (14) 99848-1539
