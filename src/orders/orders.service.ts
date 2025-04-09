@@ -10,6 +10,7 @@ import { PaginationDto } from 'src/shared/dto/pagination.dto';
 import { PaginationMeta } from 'src/shared/types/pagination-meta.type';
 import { CreateOrderBodyDto } from './dto/create-order.body.dto';
 import { OrderResponse } from './dto/order.response';
+import { AdminOrderResponse } from './dto/admin-order.response';
 
 @Injectable()
 export class OrdersService {
@@ -45,7 +46,7 @@ export class OrdersService {
   }
 
   async findAll({ page, limit }: PaginationDto): Promise<{
-    data: OrderResponse[];
+    data: AdminOrderResponse[];
     meta: PaginationMeta;
   }> {
     try {

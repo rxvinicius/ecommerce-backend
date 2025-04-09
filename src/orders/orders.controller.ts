@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RequestWithUser } from 'src/shared/types/request-with-user';
@@ -21,8 +22,10 @@ import { UserRole } from 'src/shared/constants/roles.enum';
 import { OrdersService } from './orders.service';
 import { CreateOrderBodyDto } from './dto/create-order.body.dto';
 import { OrderResponse } from './dto/order.response';
+import { AdminOrderResponse } from './dto/admin-order.response';
 
 @Controller('orders')
+@ApiTags('Orders')
 @UseGuards(JwtAuthGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
@@ -30,6 +33,8 @@ export class OrdersController {
   @Post()
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
   @RequiredRole(UserRole.CUSTOMER)
+  @ApiOperation({ summary: 'Create a new order (Customer only)' })
+  @ApiResponse({ status: 201, type: OrderResponse })
   async create(
     @Body() dto: CreateOrderBodyDto,
     @Request() req: RequestWithUser,
@@ -40,6 +45,21 @@ export class OrdersController {
   @Get('user/:userId')
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
   @RequiredRole(UserRole.CUSTOMER)
+  @ApiOperation({ summary: 'Get orders for a specific user (Customer only)' })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        data: [OrderResponse],
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          lastPage: 1,
+        },
+      },
+    },
+  })
   async findByUser(
     @Param('userId', ParseUUIDPipe) userId: string,
     @Query() pagination: PaginationDto,
@@ -50,14 +70,31 @@ export class OrdersController {
   @Get()
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
   @RequiredRole(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all orders (Admin only)' })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        data: [AdminOrderResponse],
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          lastPage: 1,
+        },
+      },
+    },
+  })
   async findAll(
     @Query() pagination: PaginationDto,
-  ): Promise<{ data: OrderResponse[]; meta: PaginationMeta }> {
+  ): Promise<{ data: AdminOrderResponse[]; meta: PaginationMeta }> {
     return this.ordersService.findAll(pagination);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
+  @ApiOperation({ summary: 'Get a specific order by ID' })
+  @ApiResponse({ status: 200, type: OrderResponse })
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<OrderResponse> {

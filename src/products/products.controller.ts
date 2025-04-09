@@ -15,6 +15,7 @@ import {
   Patch,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RoleAccessGuard } from 'src/access-control/guards/role-access.guard';
@@ -31,10 +32,13 @@ import { PaginationDto } from 'src/shared/dto/pagination.dto';
 import { PaginationMeta } from 'src/shared/types/pagination-meta.type';
 
 @Controller('products')
+@ApiTags('Products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Listar todos os produtos' })
+  @ApiResponse({ status: 200, description: 'Lista retornada com sucesso' })
   async findAll(
     @Query() pagination: PaginationDto,
   ): Promise<{ data: ProductResponse[]; meta: PaginationMeta }> {
@@ -42,6 +46,8 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Buscar um produto por ID' })
+  @ApiResponse({ status: 200, description: 'Produto encontrado' })
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<ProductResponse> {
@@ -52,6 +58,8 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
   @RequiredRole(UserRole.ADMIN)
   @UseInterceptors(FilesInterceptor('images', MAX_PRODUCT_IMAGES))
+  @ApiOperation({ summary: 'Criar novo produto (admin)' })
+  @ApiResponse({ status: 201, description: 'Produto criado com sucesso' })
   async create(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: CreateProductBodyDto,
@@ -68,6 +76,8 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard, RoleAccessGuard)
   @RequiredRole(UserRole.ADMIN)
   @UseInterceptors(FilesInterceptor('images', MAX_PRODUCT_IMAGES))
+  @ApiOperation({ summary: 'Atualizar produto (admin)' })
+  @ApiResponse({ status: 200, description: 'Produto atualizado com sucesso' })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @UploadedFiles() files: Express.Multer.File[],
@@ -77,6 +87,8 @@ export class ProductsController {
   }
 
   @Patch(':id/deactivate')
+  @ApiOperation({ summary: 'Desativar produto (admin)' })
+  @ApiResponse({ status: 200, description: 'Produto desativado com sucesso' })
   deactivate(@Param('id') id: string) {
     return this.productsService.deactivate(id);
   }
