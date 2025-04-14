@@ -72,9 +72,15 @@ Para criar o banco, execute:
 npx prisma migrate dev
 ```
 
-### 4. Configure o arquivo `.env`
+### 4. Configure o ambiente
 
-Crie um arquivo .env na raiz com o seguinte conteúdo:
+Renomeie o arquivo `.env.example` para `.env`:
+
+```bash
+mv .env.example .env
+```
+
+Depois disso, preencha os valores adequados para as variáveis abaixo:
 
 ```env
 PORT=3001
