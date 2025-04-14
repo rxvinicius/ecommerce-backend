@@ -56,23 +56,7 @@ cd ecommerce-backend
 npm install
 ```
 
-### 3. Configure o banco de dados
-
-> ⚠️ Este projeto não foi testado com banco local, apenas em produção na Neon. Para rodar localmente, você precisará de um banco PostgreSQL e atualizar a variável DATABASE_URL no .env.
-
-Exemplo de conexão local:
-
-```bash
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce?schema=public
-```
-
-Para criar o banco, execute:
-
-```bash
-npx prisma migrate dev
-```
-
-### 4. Configure o ambiente
+### 3. Configure o ambiente
 
 Renomeie o arquivo `.env.example` para `.env`:
 
@@ -82,6 +66,8 @@ mv .env.example .env
 
 Depois disso, preencha os valores adequados para as variáveis abaixo:
 
+> ℹ️ Para instruções sobre a `DATABASE_URL`, veja a próxima seção [Configure o banco de dados](#4-configure-o-banco-de-dados).
+
 ```env
 PORT=3001
 DATABASE_URL=<sua conexão aqui>
@@ -89,6 +75,23 @@ JWT_SECRET=<sua chave secreta>
 CLOUDINARY_CLOUD_NAME=<sua cloud>
 CLOUDINARY_API_KEY=<sua chave>
 CLOUDINARY_API_SECRET=<sua secret>
+```
+
+### 4. Configure o banco de dados
+
+Exemplo de conexão local:
+
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce?schema=public
+```
+
+> ℹ️ A URL acima usa o usuário `postgres` com senha `postgres`.  
+> Ajuste a URL no seu `.env` conforme necessário.
+
+Para criar o banco, execute:
+
+```bash
+npx prisma migrate dev
 ```
 
 ### 5. Rode o projeto
