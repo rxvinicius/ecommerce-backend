@@ -1,18 +1,16 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
 
 @Injectable()
 export class RoleAccessGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    private jwtService: JwtService,
-  ) {}
+  constructor(private reflector: Reflector) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const requiredRole = this.reflector.get<string>(
       'requiredRole',
       context.getHandler(),
@@ -21,9 +19,16 @@ export class RoleAccessGuard implements CanActivate {
     if (!requiredRole) return true;
 
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.split(' ')[1];
-    const user = this.jwtService.verify(token);
+    const user = request.user;
 
-    return user.role === requiredRole;
+    if (!user) {
+      throw new ForbiddenException('User not authenticated');
+    }
+
+    if (user.role !== requiredRole) {
+      throw new ForbiddenException('Forbidden resource');
+    }
+
+    return true;
   }
 }
